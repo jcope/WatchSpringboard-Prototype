@@ -109,10 +109,10 @@
 }
 
 #pragma mark - UIView
-
-- (instancetype)initWithCoder:(NSCoder *)aDecoder
-{
-  self = [super initWithCoder:aDecoder];
+//ET: Because we are creating this example programatically (rather than xibs and storyboards)
+//We need to repurpose the initializer to use the default init rather than initWithCoder (No coder available).
+-(instancetype)init{
+  self = [super init];
   if(self)
   {
     CGRect fullFrame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
