@@ -16,8 +16,6 @@
 - (void)setScale:(CGFloat)scale animated:(BOOL)animated;
 @property (nonatomic) BOOL isFolderLike;
 
-@property (nonatomic, copy) NSString* bundleIdentifier;
-
 - (void)setTitle:(NSString*)title;
 
 @end

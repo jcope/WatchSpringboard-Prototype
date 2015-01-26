@@ -11,8 +11,6 @@
 #import "LMSpringboardItemView.h"
 #import "LMSpringboardView.h"
 
-#import "LMAppController.h"
-
 @interface LMViewControllerView ()
 {
   __strong UIImageView* _appLaunchMaskView;
@@ -62,9 +60,6 @@
       _springboard.alpha = 1;
       NSUInteger index = [_springboard indexOfItemClosestToPoint:[_springboard convertPoint:pointInSelf fromView:self]];
       [_springboard centerOnIndex:index zoomScale:_springboard.zoomScale animated:NO];
-		
-		
-	  [[LMAppController sharedInstance] openAppWithBundleIdentifier:item.bundleIdentifier];
     }];
   }
 }
@@ -128,9 +123,44 @@
     _springboard.autoresizingMask = mask;
     
     NSMutableArray* itemViews = [NSMutableArray array];
-	  
-	  NSArray* apps = [LMAppController sharedInstance].installedApplications;
-	  
+    NSArray* iconNames = @[
+                           @"Spotlight",
+                           @"Calculator",
+                           @"Clock",
+                           @"Compass",
+                           @"Connect",
+                           @"Photos",
+                           @"iTunes Store",
+                           @"Passbook",
+                           @"Remote",
+                           @"Stocks",
+                           @"Contacts",
+                           @"Videos",
+                           @"Podcasts",
+                           @"Weather",
+                           @"Game Center",
+                           @"Health",
+                           @"Tips",
+                           @"Newsstand",
+                           @"FaceTime",
+                           @"Messages",
+                           @"WhatsApp",
+                           @"Voice Memos",
+                           @"Phone",
+                           @"Mail",
+                           @"Safari",
+                           @"Music",
+                           @"Reeder",
+                           @"Overcast",
+                           @"Google Maps",
+                           @"Settings",
+                           @"Notes",
+                           @"Reminders",
+                           @"Calendar",
+                           @"Find Friends",
+                           @"Tweetbot"
+                           ];
+    
     // pre-render the known icons
     NSMutableArray* images = [NSMutableArray array];
     UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
@@ -140,9 +170,9 @@
     button.maskView = maskImage;
     button.frame = maskImage.frame;
     [view addSubview:button];
-    for(LMApp* app in apps)
+    for(NSUInteger i=0; i<[iconNames count]; i++)
     {
-		UIImage* image = app.icon;
+      UIImage* image = [UIImage imageNamed:[NSString stringWithFormat:@"Icon-%i.png", (int)(i%[iconNames count])]];
       [button setBackgroundImage:image forState:UIControlStateNormal];
       
       UIGraphicsBeginImageContextWithOptions(CGSizeMake(60, 60), NO, [UIScreen mainScreen].scale);
@@ -154,13 +184,27 @@
     }
     
     // build out item set
-	NSInteger index = 0;
-    for(LMApp* app in apps)
+    NSUInteger amount = [iconNames count];
+    amount = 256;
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+      amount = 1024;
+    int skipCount = 0;
+    for(NSUInteger i=0; i<amount; i++)
     {
       LMSpringboardItemView* item = [[LMSpringboardItemView alloc] init];
-	  item.bundleIdentifier = app.bundleIdentifier;
-	  [item setTitle:app.name];
-      item.icon.image = images[index++];
+      NSString* iconName = iconNames[(int)((i+skipCount)%[iconNames count])];
+      // make sure we only have one spotlight icon.
+      if([iconName isEqualToString:@"Spotlight"] == YES)
+      {
+        if(i != 0)
+        {
+          skipCount++;
+          iconName = iconNames[(int)((i+skipCount)%[iconNames count])];
+        }
+        //item.isFolderLike = YES; // this makes the icon have a blurred background. kills performance, tho
+      }
+      [item setTitle:iconName];
+      item.icon.image = images[(int)((i+skipCount)%[images count])];
       [itemViews addObject:item];
     }
     _springboard.itemViews = itemViews;
