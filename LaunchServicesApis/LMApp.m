@@ -13,19 +13,13 @@
 + (id)_applicationIconImageForBundleIdentifier:(id)arg1 format:(int)arg2 scale:(double)arg3;
 @end
 
-#pragma mark -
-
 @interface PrivateApi_LSApplicationProxy
-
-+ (instancetype)applicationProxyForIdentifier:(NSString*)identifier;
++(instancetype)applicationProxyForIdentifier:(NSString*)identifier;
 @property (nonatomic, readonly) NSString* localizedShortName;
 @property (nonatomic, readonly) NSString* localizedName;
 @property (nonatomic, readonly) NSString* bundleIdentifier;
 @property (nonatomic, readonly) NSArray* appTags;
-
 @end
-
-#pragma mark -
 
 @implementation LMApp
 {
@@ -33,17 +27,49 @@
 	UIImage* _icon;
 }
 
-- (NSString*)name
++(instancetype)appWithPrivateProxy:(id)privateProxy
+{
+	return [[self alloc] initWithPrivateProxy:privateProxy];
+}
+
+-(id)initWithPrivateProxy:(id)privateProxy
+{
+	self = [super init];
+	if(self != nil)
+	{
+		_applicationProxy = (PrivateApi_LSApplicationProxy*)privateProxy;
+	}
+	
+	return self;
+}
+
++(instancetype)appWithBundleIdentifier:(NSString*)bundleIdentifier
+{
+	return [[self alloc] initWithBundleIdentifier:bundleIdentifier];
+}
+
+-(id)initWithBundleIdentifier:(NSString*)bundleIdentifier
+{
+	self = [super init];
+	if(self != nil)
+	{
+		_applicationProxy = [NSClassFromString(@"LSApplicationProxy") applicationProxyForIdentifier:bundleIdentifier];
+	}
+	
+	return self;
+}
+
+-(NSString*)name
 {
 	return _applicationProxy.localizedName ?: _applicationProxy.localizedShortName;
 }
 
-- (NSString*)bundleIdentifier
+-(NSString*)bundleIdentifier
 {
 	return [_applicationProxy bundleIdentifier];
 }
 
-- (UIImage*)icon
+-(UIImage*)icon
 {
 	if(nil == _icon)
 	{
@@ -53,41 +79,9 @@
 	return _icon;
 }
 
-- (BOOL)isHiddenApp
+-(BOOL)isHiddenApp
 {
 	return [[_applicationProxy appTags] indexOfObject:@"hidden"] != NSNotFound;
-}
-
-- (id)initWithPrivateProxy:(id)privateProxy
-{
-  self = [super init];
-  if(self != nil)
-  {
-    _applicationProxy = (PrivateApi_LSApplicationProxy*)privateProxy;
-  }
-  
-  return self;
-}
-
-- (instancetype)initWithBundleIdentifier:(NSString*)bundleIdentifier
-{
-  self = [super init];
-  if(self != nil)
-  {
-    _applicationProxy = [NSClassFromString(@"LSApplicationProxy") applicationProxyForIdentifier:bundleIdentifier];
-  }
-  
-  return self;
-}
-
-+ (instancetype)appWithPrivateProxy:(id)privateProxy
-{
-  return [[self alloc] initWithPrivateProxy:privateProxy];
-}
-
-+ (instancetype)appWithBundleIdentifier:(NSString*)bundleIdentifier
-{
-  return [[self alloc] initWithBundleIdentifier:bundleIdentifier];
 }
 
 @end

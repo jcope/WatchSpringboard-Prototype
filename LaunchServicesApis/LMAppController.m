@@ -9,19 +9,27 @@
 #import "LMAppController.h"
 
 @interface PrivateApi_LSApplicationWorkspace
-- (NSArray*)allInstalledApplications;
+-(NSArray*)allInstalledApplications;
 - (bool)openApplicationWithBundleID:(id)arg1;
 @end
 
-#pragma mark -
-
 @implementation LMAppController
 {
-  PrivateApi_LSApplicationWorkspace* _workspace;
-  NSArray* _installedApplications;
+	PrivateApi_LSApplicationWorkspace* _workspace;
+	NSArray* _installedApplications;
 }
 
-- (instancetype)init
++(instancetype)sharedInstance
+{
+	static dispatch_once_t once;
+	static id sharedInstance;
+	dispatch_once(&once, ^{
+		sharedInstance = [[self alloc] init];
+	});
+	return sharedInstance;
+}
+
+-(id)init
 {
 	self = [super init];
 	if(self != nil)
@@ -32,7 +40,7 @@
 	return self;
 }
 
-- (NSArray*)readApplications
+-(NSArray*)readApplications
 {
 	NSArray* allInstalledApplications = [_workspace allInstalledApplications];
 	NSMutableArray* applications = [NSMutableArray arrayWithCapacity:allInstalledApplications.count];
@@ -48,7 +56,7 @@
 	return applications;
 }
 
-- (NSArray*)installedApplications
+-(NSArray*)installedApplications
 {
 	if(nil == _installedApplications)
 	{
@@ -58,19 +66,9 @@
 	return _installedApplications;
 }
 
-- (BOOL)openAppWithBundleIdentifier:(NSString *)bundleIdentifier
+-(BOOL)openAppWithBundleIdentifier:(NSString *)bundleIdentifier
 {
 	return (BOOL)[_workspace openApplicationWithBundleID:bundleIdentifier];
-}
-
-+ (instancetype)sharedInstance
-{
-  static dispatch_once_t once;
-  static id sharedInstance;
-  dispatch_once(&once, ^{
-    sharedInstance = [[self alloc] init];
-  });
-  return sharedInstance;
 }
 
 @end

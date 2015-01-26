@@ -11,10 +11,9 @@
 
 @interface LMAppController : NSObject
 
++(instancetype)sharedInstance;
 @property (nonatomic, readonly) NSArray* installedApplications;
 
-- (BOOL)openAppWithBundleIdentifier:(NSString*)bundleIdentifier;
-
-+ (instancetype)sharedInstance;
+-(BOOL)openAppWithBundleIdentifier:(NSString*)bundleIdentifier;
 
 @end

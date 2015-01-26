@@ -133,14 +133,20 @@
 	  
     // pre-render the known icons
     NSMutableArray* images = [NSMutableArray array];
-    UIBezierPath* clipPath = [UIBezierPath bezierPathWithOvalInRect:CGRectInset(CGRectMake(0, 0, 60, 60), 0.5,0.5)];
+    UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
+    UIImageView* maskImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Icon.png"]];
+    [view addSubview:maskImage];
+    UIButton* button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.maskView = maskImage;
+    button.frame = maskImage.frame;
+    [view addSubview:button];
     for(LMApp* app in apps)
     {
-      UIImage* image = app.icon;
+		UIImage* image = app.icon;
+      [button setBackgroundImage:image forState:UIControlStateNormal];
       
       UIGraphicsBeginImageContextWithOptions(CGSizeMake(60, 60), NO, [UIScreen mainScreen].scale);
-      [clipPath addClip];
-      [image drawInRect:CGRectMake(0, 0, 60, 60)];
+      [view.layer renderInContext:UIGraphicsGetCurrentContext()];
       UIImage* renderedImage = UIGraphicsGetImageFromCurrentImageContext();
       UIGraphicsEndImageContext();
       
@@ -148,12 +154,12 @@
     }
     
     // build out item set
-    NSInteger index = 0;
+	NSInteger index = 0;
     for(LMApp* app in apps)
     {
       LMSpringboardItemView* item = [[LMSpringboardItemView alloc] init];
-      item.bundleIdentifier = app.bundleIdentifier;
-      [item setTitle:app.name];
+	  item.bundleIdentifier = app.bundleIdentifier;
+	  [item setTitle:app.name];
       item.icon.image = images[index++];
       [itemViews addObject:item];
     }
