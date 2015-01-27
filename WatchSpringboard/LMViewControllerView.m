@@ -162,21 +162,16 @@
                            ];
     
     // pre-render the known icons
-    NSMutableArray* images = [NSMutableArray array];
-    UIView* view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
-    UIImageView* maskImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Icon.png"]];
-    [view addSubview:maskImage];
-    UIButton* button = [UIButton buttonWithType:UIButtonTypeCustom];
-    button.maskView = maskImage;
-    button.frame = maskImage.frame;
-    [view addSubview:button];
+    NSMutableArray* images = [NSMutableArray array];      
+    UIBezierPath* clipPath = [UIBezierPath bezierPathWithOvalInRect:CGRectInset(CGRectMake(0, 0, 60, 60), 0.5,0.5)];
+    
     for(NSUInteger i=0; i<[iconNames count]; i++)
     {
       UIImage* image = [UIImage imageNamed:[NSString stringWithFormat:@"Icon-%i.png", (int)(i%[iconNames count])]];
-      [button setBackgroundImage:image forState:UIControlStateNormal];
-      
+        
       UIGraphicsBeginImageContextWithOptions(CGSizeMake(60, 60), NO, [UIScreen mainScreen].scale);
-      [view.layer renderInContext:UIGraphicsGetCurrentContext()];
+      [clipPath addClip];
+      [image drawInRect:CGRectMake(0, 0, 60, 60)];
       UIImage* renderedImage = UIGraphicsGetImageFromCurrentImageContext();
       UIGraphicsEndImageContext();
       
